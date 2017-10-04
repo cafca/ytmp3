@@ -18,8 +18,10 @@ CHROME_BOOKMARKS = "/Users/vaul/Library/Application Support/Google/Chrome/Defaul
 MP3_FOLDER = "/Users/vaul/Music/ytmp3"
 
 # Parameters for youtube-dl script
-YOUTUBE_PARAMS = "-f bestaudio --extract-audio --audio-format mp3 --audio-quality 320 --add-metadata  --embed-thumbnail --no-playlist"
+YOUTUBE_PARAMS = "-f bestaudio --extract-audio --audio-format mp3 --audio-quality 320 --add-metadata --embed-thumbnail --no-playlist"
 
+# File name pattern for mp3 using youtube-dl format option
+FNAME_FORMAT = "%(title)s (%(abr)sk)_%(id)s_%(ext)s.%(ext)s"
 
 ydl = sh.Command("youtube-dl")
 
@@ -79,7 +81,7 @@ def check_links(links):
         ytid = get_ytid(link)
         if ytid:
             print("{} - {}: {}".format(year, month, ytid))
-            fpath = [MP3_FOLDER, year, month, "%(title)s_%(id)s_%(ext)s.%(ext)s"]
+            fpath = [MP3_FOLDER, year, month, FNAME_FORMAT]
             if not file_exists(fpath, ytid):
                 donwload_link(link, path.sep.join(fpath))
 
@@ -95,7 +97,7 @@ def file_exists(fpath, ytid):
 
 
 if __name__ == "__main__":
-    with open(CHROME_BOOKMARKS, "r") as f:
+    with open(CHROME_BOOKMARKS, "rb") as f:
         bookmarks = json.load(f)
 
     try:
