@@ -13,8 +13,11 @@ your computer.
 2. Setup environment and clone repo
 
     $ virtualenv -p python3 ytmp3
+    
     $ cd ytmp3
+    
     $ source bin/activate
+    
     $ git clone https://github.com/ciex/ytmp3 src
 
 3. Edit the `CHROME_BOOKSMARKS` and `MP3_FOLDER` variables in `ytmp3.py`, then
