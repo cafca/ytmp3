@@ -19,6 +19,12 @@ your computer.
     $ source bin/activate
     
     $ git clone https://github.com/ciex/ytmp3 src
+    
+    $ pip install -r src/requirements.txt
+    
+    test with
+    
+    $ python src/ytmp3.py
 
 3. Edit the `CHROME_BOOKSMARKS` and `MP3_FOLDER` variables in `ytmp3.py`, then
 edit the first two lines in `start.sh`.
