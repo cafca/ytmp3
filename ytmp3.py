@@ -3,7 +3,8 @@
 import json
 import re
 import sh
-import eyed3
+# import eyed3
+import click
 from os import path, walk
 from datetime import datetime
 from time import sleep
@@ -19,7 +20,7 @@ home = str(Path.home())
 CHROME_BOOKMARKS = path.sep.join([home, "Library/Application Support/Google/Chrome/Default/Bookmarks"])
 
 # Destination folder mp3s will be saved to
-MP3_FOLDER = path.sep.join([home, "Music/ytmp3"])
+MP3_FOLDER = path.sep.join([home, "Music", "ytmp3"])
 
 # Parameters for youtube-dl script
 YOUTUBE_PARAMS = "-f bestaudio --extract-audio --audio-format mp3 --audio-quality 320 --add-metadata --embed-thumbnail --no-playlist"
@@ -60,15 +61,16 @@ def donwload_link(link, fname):
     print("Downloading {} at {}".format(link["name"], datetime.now()))
     cmd = YOUTUBE_PARAMS.split(" ") + ["-o", fname, link["url"]]
     output = ydl(cmd)
-    # outfile = extract_download_location(str(output))
+    outfile = extract_download_location(str(output))
+    print("Completed at {}".format(outfile))
     # write_mp3_tags(outfile)
 
 
-def write_mp3_tags(fname):
-    f = eyed3.load(fname)
-    f.tag.artist = artist
-    f.tag.title = title
-    f.tag.save()
+# def write_mp3_tags(fname):
+#     f = eyed3.load(fname)
+#     f.tag.artist = artist
+#     f.tag.title = title
+#     f.tag.save()
 
 
 def extract_download_location(output):
@@ -98,7 +100,7 @@ def file_exists(ytid):
     return False
 
 
-def main():
+def run():
     with open(CHROME_BOOKMARKS, "rb") as f:
         bookmarks = json.load(f)
 
@@ -113,12 +115,20 @@ def main():
             check_links(node["children"])
 
 
+@click.command()
+@click.option('--loop/--no-loop', default=False, help="Auto checking every 5 minutes.")
+def main(loop):
+    click.echo("Starting ytmp3...")
+    if loop:
+        try:
+            while True:
+                run()
+                sleep(10)
+        except KeyboardInterrupt:
+            click.echo("\nGoodbye!")
+    else:
+        run()
+
+
 if __name__ == "__main__":
-    try:
-        print("Starting ytmp3...")
-        while True:
-            main()
-            sleep(10)
-    except KeyboardInterrupt:
-        print("--- Goodbye!")
-        pass
+    main()

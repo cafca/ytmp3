@@ -1,3 +1,2 @@
 sh>=1.12.14
-APScheduler>=3.3.1
-
+click>=6.7
