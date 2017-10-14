@@ -31,10 +31,11 @@ def is_bookmarks_folder(node):
     return "name" in node and node["name"] == "ytmp3"
 
 
-def get_time(link):
+def get_time():
     """Return tuple of year and month as string for sorting files into folders."""
-    ts = link["date_added"]
-    dt = datetime.fromtimestamp(int(ts) / 10000000)
+    # ts = link["date_added"]
+    # dt = datetime.fromtimestamp(int(ts) / 10000000)
+    dt = datetime.now()
     return str(dt.year), str(dt.month)
 
 
@@ -52,7 +53,7 @@ def get_ytid(link):
 
 def donwload_link(link, fname):
     """Download link using youtube-dl."""
-    print("Downloading {}".format(link["name"]))
+    print("Downloading {} at {}".format(link["name"], datetime.now()))
     cmd = YOUTUBE_PARAMS.split(" ") + ["-o", fname, link["url"]]
     output = ydl(cmd)
     # outfile = extract_download_location(str(output))
@@ -75,21 +76,18 @@ def extract_download_location(output):
 
 def check_links(links):
     """Check all bookmarks in a folder and download all new YouTube links."""
-    print("Checking {} links".format(len(links)))
+    year, month = get_time()
     for link in links:
-        year, month = get_time(link)
         ytid = get_ytid(link)
         if ytid:
-            print("{} - {}: {}".format(year, month, ytid))
             fpath = [MP3_FOLDER, year, month, FNAME_FORMAT]
-            if not file_exists(fpath, ytid):
+            if not file_exists(ytid):
                 donwload_link(link, path.sep.join(fpath))
 
 
-def file_exists(fpath, ytid):
+def file_exists(ytid):
     """Check if a file for given YouTube-ID exists at path."""
-    p = path.sep.join(fpath[:-1])
-    for (dirpath, dirnames, filenames) in walk(p):
+    for (dirpath, dirnames, filenames) in walk(MP3_FOLDER):
         for f in filenames:
             if f.find(ytid) >= 0:
                 return True
