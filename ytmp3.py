@@ -94,7 +94,7 @@ def file_exists(ytid):
     return False
 
 
-if __name__ == "__main__":
+def main():
     with open(CHROME_BOOKMARKS, "rb") as f:
         bookmarks = json.load(f)
 
@@ -107,3 +107,7 @@ if __name__ == "__main__":
     for node in bookmark_bar:
         if is_bookmarks_folder(node):
             check_links(node["children"])
+
+
+if __name__ == "__main__":
+    main()
