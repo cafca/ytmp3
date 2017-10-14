@@ -6,16 +6,20 @@ import sh
 import eyed3
 from os import path, walk
 from datetime import datetime
+from time import sleep
+from pathlib import Path
 
 #
 # brew install youtube-dl ffmpeg libmagic
 #
 
+home = str(Path.home())
+
 # Location of Chrome bookmarks file (JSON format)
-CHROME_BOOKMARKS = "/Users/vaul/Library/Application Support/Google/Chrome/Default/Bookmarks"
+CHROME_BOOKMARKS = path.sep.join([home, "Library/Application Support/Google/Chrome/Default/Bookmarks"])
 
 # Destination folder mp3s will be saved to
-MP3_FOLDER = "/Users/vaul/Music/ytmp3"
+MP3_FOLDER = path.sep.join([home, "Music/ytmp3"])
 
 # Parameters for youtube-dl script
 YOUTUBE_PARAMS = "-f bestaudio --extract-audio --audio-format mp3 --audio-quality 320 --add-metadata --embed-thumbnail --no-playlist"
@@ -110,4 +114,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        print("Starting ytmp3...")
+        while True:
+            main()
+            sleep(10)
+    except KeyboardInterrupt:
+        print("--- Goodbye!")
+        pass
