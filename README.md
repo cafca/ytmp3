@@ -6,15 +6,15 @@ your computer.
 
 ## Installation
 
-1. Install dependencies
+Install dependencies
 
     $ brew install youtube-dl libav
 
-2. Download and extract the (lastest ytmp3 release)[https://github.com/ciex/ytmp3/releases].
+Download and extract the (lastest ytmp3 release)[https://github.com/ciex/ytmp3/releases].
 
 Optional:
 
-3. Run in the background by changing the line in `crontab` file to point to
+Run in the background by changing the line in `crontab` file to point to
 your installation directory and pasting it in your crontab with
 
     $ crontab -e
@@ -32,27 +32,23 @@ bar to the folder `~/Music/ytmp3/[year]/[month]/` as mp3 files.
 
 ## Environment setup (Mac)
 
-1. Install deps
+Install deps
 
     $ brew install youtube-dl libav python3 pip
 
-2. Setup environment and clone repo
+Setup environment and clone repo
 
     $ virtualenv -p python3 ytmp3
-
     $ cd ytmp3
-
     $ source bin/activate
-
     $ git clone https://github.com/ciex/ytmp3 src
-
     $ pip install -r src/requirements.txt
-
-    test with
-
+    
+test with
+    
     $ python src/ytmp3.py
 
-4. Adapt and then add the line in the `cronjob` file to your crontab by executing `crontab -e`
+Adapt and then add the line in the `cronjob` file to your crontab by executing `crontab -e`
 
 ## License
 
