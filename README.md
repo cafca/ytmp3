@@ -4,7 +4,33 @@ This script lets you save YouTube links to a Chrome bookmarks folder, which
 are then automatically downloaded and converted to MP3s in a local folder on
 your computer.
 
-## Installation (Mac)
+## Installation
+
+1. Install dependencies
+
+    $ brew install youtube-dl libav
+
+2. Download and extract the (lastest ytmp3 release)[https://github.com/ciex/ytmp3/releases].
+
+Optional:
+
+3. Run in the background by changing the line in `crontab` file to point to
+your installation directory and pasting it in your crontab with
+
+    $ crontab -e
+
+
+## Usage
+
+Run
+
+    $ ./dist/ytmp3
+
+Script will download all links in the `ytmp3` folder in your Chrome bookmark
+bar to the folder `~/Music/ytmp3/[year]/[month]/` as mp3 files.
+
+
+## Environment setup (Mac)
 
 1. Install deps
 
@@ -13,28 +39,20 @@ your computer.
 2. Setup environment and clone repo
 
     $ virtualenv -p python3 ytmp3
-    
+
     $ cd ytmp3
-    
+
     $ source bin/activate
-    
+
     $ git clone https://github.com/ciex/ytmp3 src
-    
+
     $ pip install -r src/requirements.txt
-    
+
     test with
-    
+
     $ python src/ytmp3.py
 
-3. Edit the `CHROME_BOOKSMARKS` and `MP3_FOLDER` variables in `ytmp3.py`, then
-edit the first two lines in `start.sh`.
-
-4. Add the line in the `cronjob` file to your crontab by executing `crontab -e`
-
-## Issues
-
-- Bookmark date is not converted correctly so that folder names don't reflect
-    date of bookmark correctly
+4. Adapt and then add the line in the `cronjob` file to your crontab by executing `crontab -e`
 
 ## License
 
