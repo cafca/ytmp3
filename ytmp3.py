@@ -50,7 +50,7 @@ def get_ytid(link):
     match = re.match(exp, link["url"])
 
     if not match:
-        print("No ytid found for {}".format(link["url"]))
+        click.echo("No ytid found for {}".format(link["url"]))
         return False
     else:
         return match.group(1)
@@ -58,11 +58,14 @@ def get_ytid(link):
 
 def donwload_link(link, fname):
     """Download link using youtube-dl."""
-    print("Downloading {} at {}".format(link["name"], datetime.now()))
+    click.echo("Downloading {} at {}".format(link["name"], datetime.now()))
     cmd = YOUTUBE_PARAMS.split(" ") + ["-o", fname, link["url"]]
     output = ydl(cmd)
     outfile = extract_download_location(str(output))
-    print("Completed at {}".format(outfile))
+    if outfile:
+        click.echo("Completed at {}".format(outfile))
+    else:
+        click.echo("Download of {} failed".format(link["url"]))
     # write_mp3_tags(outfile)
 
 
@@ -75,9 +78,13 @@ def donwload_link(link, fname):
 
 def extract_download_location(output):
     """Extract final filename from youtube-dl shell output."""
-    start = output.find("[ffmpeg] Destination:")
+    target = "[ffmpeg] Destination:"
+    start = output.find(target)
     end = output.find("\n", start)
-    return output[start, end]
+    try:
+        return output[start + len(target):end]
+    except TypeError:
+        return False
 
 
 def check_links(links):
@@ -92,7 +99,7 @@ def check_links(links):
 
 
 def file_exists(ytid):
-    """Check if a file for given YouTube-ID exists at path."""
+    """Check if a file for given YouTube-ID exists."""
     for (dirpath, dirnames, filenames) in walk(MP3_FOLDER):
         for f in filenames:
             if f.find(ytid) >= 0:
@@ -107,7 +114,7 @@ def run():
     try:
         bookmark_bar = bookmarks["roots"]["bookmark_bar"]["children"]
     except KeyError:
-        print("Create 'ytmp3' bookmark in your bookmark bar and put links in it!")
+        click.echo("Create 'ytmp3' bookmark in your bookmark bar and put links in it!")
         quit()
 
     for node in bookmark_bar:
@@ -116,7 +123,9 @@ def run():
 
 
 @click.command()
-@click.option('--loop/--no-loop', default=False, help="Auto checking every 5 minutes.")
+@click.option('--loop/--no-loop',
+    default=False,
+    help="Auto checking every 5 minutes.")
 def main(loop):
     click.echo("Starting ytmp3...")
     if loop:
