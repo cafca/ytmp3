@@ -5,7 +5,7 @@ Do you listen to music on YouTube? Do you save your favorites to your browser bo
 This script automatically downloads YouTube bookmarks from Chrome to your computer
 and turns them into MP3s.
 
-## Installation
+## Installation on Mac
 
 Install dependencies
 
