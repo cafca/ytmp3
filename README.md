@@ -1,6 +1,6 @@
 # ytmp3
 
-Do you listen yo music on YouTube? Do you save your favorites to your browser bookmarks but when you come back to them later they have been deleted?
+Do you listen to music on YouTube? Do you save your favorites to your browser bookmarks but when you come back to them later they have been deleted?
 
 This script automatically downloads YouTube bookmarks from Chrome to your computer
 and turns them into MP3s.
