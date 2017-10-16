@@ -1,8 +1,9 @@
 # ytmp3
 
-This script lets you save YouTube links to a Chrome bookmarks folder, which
-are then automatically downloaded and converted to MP3s in a local folder on
-your computer.
+Do you listen yo music on YouTube? Do you save your favorites to your browser bookmarks but when you come back to them later they have been deleted?
+
+This script automatically downloads YouTube bookmarks from Chrome to your computer
+and turns them into MP3s.
 
 ## Installation
 
