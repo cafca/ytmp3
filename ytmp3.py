@@ -2,8 +2,7 @@
 
 import json
 import re
-import sh
-# import eyed3
+import youtube_dl
 import click
 from os import path, walk
 from datetime import datetime
@@ -28,20 +27,21 @@ YOUTUBE_PARAMS = "-f bestaudio --extract-audio --audio-format mp3 --audio-qualit
 # File name pattern for mp3 using youtube-dl format option
 FNAME_FORMAT = "%(title)s (%(abr)sk)_%(id)s_%(ext)s.%(ext)s"
 
-ydl = sh.Command("youtube-dl")
-
 
 def is_bookmarks_folder(node):
     """True if the current node is the folder where YouTube links are stored."""
     return "name" in node and node["name"] == "ytmp3"
 
 
-def get_time():
-    """Return tuple of year and month as string for sorting files into folders."""
-    # ts = link["date_added"]
-    # dt = datetime.fromtimestamp(int(ts) / 10000000)
+def target_path():
+    """Return os specific target path for output files."""
     dt = datetime.now()
-    return str(dt.year), str(dt.month)
+    return path.sep.join([
+        MP3_FOLDER,
+        str(dt.year),
+        str(dt.month),
+        FNAME_FORMAT
+    ])
 
 
 def get_ytid(link):
@@ -56,46 +56,61 @@ def get_ytid(link):
         return match.group(1)
 
 
-def donwload_link(link, fname):
-    """Download link using youtube-dl."""
-    click.echo("Downloading {} at {}".format(link["name"], datetime.now()))
-    cmd = YOUTUBE_PARAMS.split(" ") + ["-o", fname, link["url"]]
-    output = ydl(cmd)
-    outfile = extract_download_location(str(output))
-    if outfile:
-        click.echo("Completed at {}".format(outfile))
+def donwload_links(links):
+    """Download links using youtube-dl."""
+    click.echo("Downloading {} links at {}".format(len(links), datetime.now()))
+
+    class DownloadLogger(object):
+        def debug(self, msg):
+            pass
+
+        def warning(self, msg):
+            click.echo("[WARNING] {}".format(msg))
+
+        def error(self, msg):
+            click.echo("[ERROR] {}".format(msg))
+
+    youtube_params = {
+        'format': 'bestaudio/best',
+        'forcetitle': True,
+        'writethumbnail': True,
+        'noplaylist': True,
+        'outtmpl': target_path(),
+        'progress_hooks': [show_download_progress],
+        'logger': DownloadLogger(),
+        'postprocessors': [
+            {"key": "FFmpegExtractAudio", "preferredcodec": "mp3"},
+            {"key": "MetadataFromTitle", "titleformat": '%(artist)s - %(title)s'},
+            {'key': 'FFmpegMetadata'},
+            {'key': 'EmbedThumbnail'}
+        ]
+    }
+
+    with youtube_dl.YoutubeDL(youtube_params) as ydl:
+        ydl.download([link["url"] for link in links])
+
+
+def show_download_progress(progress):
+    """Show status of finished/failed downloads as they occur."""
+    if progress["status"] == 'finished':
+        click.echo("Download of {} finished. Now converting to mp3...")
+    elif progress["status"] == 'error':
+        click.echo("Download of {} failed with error {}")
     else:
-        click.echo("Download of {} failed".format(link["url"]))
-    # write_mp3_tags(outfile)
-
-
-# def write_mp3_tags(fname):
-#     f = eyed3.load(fname)
-#     f.tag.artist = artist
-#     f.tag.title = title
-#     f.tag.save()
-
-
-def extract_download_location(output):
-    """Extract final filename from youtube-dl shell output."""
-    target = "[ffmpeg] Destination:"
-    start = output.find(target)
-    end = output.find("\n", start)
-    try:
-        return output[start + len(target):end]
-    except TypeError:
-        return False
+        pass
 
 
 def check_links(links):
     """Check all bookmarks in a folder and download all new YouTube links."""
-    year, month = get_time()
+    to_download = []
     for link in links:
         ytid = get_ytid(link)
-        if ytid:
-            fpath = [MP3_FOLDER, year, month, FNAME_FORMAT]
-            if not file_exists(ytid):
-                donwload_link(link, path.sep.join(fpath))
+        if ytid and not file_exists(ytid):
+            to_download.append(link)
+    if (len(to_download)) == 0:
+        click.echo("Didn't find any new links to download")
+    else:
+        donwload_links(to_download)
 
 
 def file_exists(ytid):
