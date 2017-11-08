@@ -11,7 +11,12 @@ Install dependencies
 
     $ brew install youtube-dl libav
 
-Download and extract the (lastest ytmp3 release)[https://github.com/ciex/ytmp3/releases].
+Download and extract the [lastest ytmp3 release](https://github.com/ciex/ytmp3/releases).
+Then double-click the `ytmp3` file.
+
+If you get an error that this file is from an unidentified developer, don't let them tell 
+you what to do! Open *System Preferences*, go to the *Security&Privacy* pane and on the *general*
+tab click *open anyway*.
 
 Optional:
 
