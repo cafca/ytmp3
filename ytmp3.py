@@ -58,7 +58,7 @@ def get_ytid(link):
 
 def donwload_links(links):
     """Download links using youtube-dl."""
-    click.echo("Downloading {} links at {}".format(len(links), datetime.now()))
+    click.echo("Downloading {} links".format(len(links)))
 
     class DownloadLogger(object):
         def debug(self, msg):
@@ -93,9 +93,9 @@ def donwload_links(links):
 def show_download_progress(progress):
     """Show status of finished/failed downloads as they occur."""
     if progress["status"] == 'finished':
-        click.echo("Download of {} finished. Now converting to mp3...")
+        click.echo("Download of {} finished. Now converting to mp3...".format(progress["filename"]))
     elif progress["status"] == 'error':
-        click.echo("Download of {} failed with error {}")
+        click.echo("Download of {} failed\n\n{}".format(progress["filename"], progress))
     else:
         pass
 
@@ -123,8 +123,11 @@ def file_exists(ytid):
 
 
 def run():
-    with open(CHROME_BOOKMARKS, "rb") as f:
-        bookmarks = json.load(f)
+    try:
+        with open(CHROME_BOOKMARKS, "rb") as f:
+            bookmarks = json.load(f)
+    except FileNotFoundError:
+        click.echo("Couldn't find Google Chrome bookmarks at {}. Is it installed?".format(CHROME_BOOKMARKS))
 
     try:
         bookmark_bar = bookmarks["roots"]["bookmark_bar"]["children"]
