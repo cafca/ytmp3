@@ -10,8 +10,9 @@ from time import sleep
 from pathlib import Path
 
 #
-# brew install youtube-dl ffmpeg libmagic
+# brew install youtube-dl ffmpeg libav
 #
+# User home directory
 
 home = str(Path.home())
 
@@ -22,14 +23,15 @@ CHROME_BOOKMARKS = path.sep.join([home, "Library/Application Support/Google/Chro
 MP3_FOLDER = path.sep.join([home, "Music", "ytmp3"])
 
 # Parameters for youtube-dl script
-YOUTUBE_PARAMS = "-f bestaudio --extract-audio --audio-format mp3 --audio-quality 320 --add-metadata --embed-thumbnail --no-playlist"
+YOUTUBE_PARAMS = """-f bestaudio --extract-audio --audio-format mp3 
+--audio-quality 320 --add-metadata --embed-thumbnail --no-playlist"""
 
 # File name pattern for mp3 using youtube-dl format option
 FNAME_FORMAT = "%(title)s (%(abr)sk)_%(id)s_%(ext)s.%(ext)s"
 
 
 def is_bookmarks_folder(node):
-    """True if the current node is the folder where YouTube links are stored."""
+    """True if current node is the folder where YouTube links are stored."""
     return "name" in node and node["name"] == "ytmp3"
 
 
@@ -50,7 +52,7 @@ def get_ytid(link):
     match = re.search(exp, link["url"])
 
     if not match:
-        click.echo("No ytid found for {}".format(link["url"]))
+        click.echo("No ytid found for {}".format(link["url"]), err=True)
         return False
     else:
         return match.group(1)
@@ -68,7 +70,7 @@ def donwload_links(links):
             click.echo("[WARNING] {}".format(msg))
 
         def error(self, msg):
-            click.echo("[ERROR] {}".format(msg))
+            click.echo("[ERROR] {}".format(msg), err=True)
 
     youtube_params = {
         'format': 'bestaudio/best',
@@ -80,7 +82,8 @@ def donwload_links(links):
         'logger': DownloadLogger(),
         'postprocessors': [
             {"key": "FFmpegExtractAudio", "preferredcodec": "mp3"},
-            {"key": "MetadataFromTitle", "titleformat": '%(artist)s - %(title)s'},
+            {"key": "MetadataFromTitle", 
+                "titleformat": '%(artist)s - %(title)s'},
             {'key': 'FFmpegMetadata'},
             {'key': 'EmbedThumbnail'}
         ]
@@ -93,9 +96,11 @@ def donwload_links(links):
 def show_download_progress(progress):
     """Show status of finished/failed downloads as they occur."""
     if progress["status"] == 'finished':
-        click.echo("Download of {} finished. Now converting to mp3...".format(progress["filename"]))
+        click.echo("Download of {} finished. Now converting to mp3...".format(
+            progress["filename"]))
     elif progress["status"] == 'error':
-        click.echo("Download of {} failed\n\n{}".format(progress["filename"], progress))
+        click.echo("Download of {} failed\n\n{}".format(
+            progress["filename"], progress), err=True)
     else:
         pass
 
@@ -127,25 +132,27 @@ def run():
         with open(CHROME_BOOKMARKS, "rb") as f:
             bookmarks = json.load(f)
     except FileNotFoundError:
-        click.echo("Couldn't find Google Chrome bookmarks at {}. Is it installed?".format(CHROME_BOOKMARKS))
+        click.echo("Couldn't find Google Chrome bookmarks at " + 
+            "{}. Is it installed?""".format(CHROME_BOOKMARKS), err=True)
+    else:
+        try:
+            bookmark_bar = bookmarks["roots"]["bookmark_bar"]["children"]
+        except KeyError:
+            msg = "Create 'ytmp3' bookmark in bookmark bar and put links in it!"
+            click.echo(msg, err=True)
+            quit()
 
-    try:
-        bookmark_bar = bookmarks["roots"]["bookmark_bar"]["children"]
-    except KeyError:
-        click.echo("Create 'ytmp3' bookmark in your bookmark bar and put links in it!")
-        quit()
-
-    for node in bookmark_bar:
-        if is_bookmarks_folder(node):
-            check_links(node["children"])
+        for node in bookmark_bar:
+            if is_bookmarks_folder(node):
+                check_links(node["children"])
 
 
 @click.command()
-@click.option('--loop/--no-loop',
-    default=False,
+@click.option('--loop/--no-loop', default=False,
     help="Auto checking every 5 minutes.")
 def main(loop):
-    click.echo("Starting ytmp3...")
+    click.echo("{} Starting ytmp3...".format(datetime.now().isoformat()), 
+        nl=False)
     if loop:
         try:
             while True:
