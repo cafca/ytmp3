@@ -46,8 +46,8 @@ def target_path():
 
 def get_ytid(link):
     """Return YouTube-ID for a YouTube link."""
-    exp = ".+[/?&]v=(\w+)"
-    match = re.match(exp, link["url"])
+    exp = "v=([-_\w]+)"
+    match = re.search(exp, link["url"])
 
     if not match:
         click.echo("No ytid found for {}".format(link["url"]))
