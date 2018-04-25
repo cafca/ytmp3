@@ -1,1 +1,1 @@
-*/5 * * * * /Users/vaul/Projects/ytmp3/src/scripts/start.sh >> /Users/vaul/Projects/ytmp3/src/ytmp3.log 2>&1
+*/5 * * * * /Users/pv/projects/ytmp3/src/scripts/start.sh >> /Users/pv/projects/ytmp3/src/ytmp3.log 2>&1
