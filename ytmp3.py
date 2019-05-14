@@ -48,14 +48,16 @@ def target_path():
 
 def get_ytid(link):
     """Return YouTube-ID for a YouTube link."""
-    exp = "v=([-_\w]+)"
+    exp = "(v|list)=([-_\w]+)"
     match = re.search(exp, link["url"])
 
     if not match:
         click.echo("No ytid found for {}".format(link["url"]), err=True)
         return False
     else:
-        return match.group(1)
+        if (match.group(1) == 'list'):
+            click.echo('Downloading all tracks from playlist...')
+        return match.group(2)
 
 
 def donwload_links(links):
@@ -76,7 +78,7 @@ def donwload_links(links):
         'format': 'bestaudio/best',
         'forcetitle': True,
         'writethumbnail': True,
-        'noplaylist': True,
+        'noplaylist': False,
         'outtmpl': target_path(),
         'progress_hooks': [show_download_progress],
         'logger': DownloadLogger(),
