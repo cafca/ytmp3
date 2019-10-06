@@ -1,13 +1,17 @@
+# -*- coding: utf-8 -*-
 """Download YouTube links from a chrome bookmark folder and save as MP3s."""
 
 import json
 import re
 import youtube_dl
 import click
+
 from os import path, walk
 from datetime import datetime
 from time import sleep
 from pathlib import Path
+
+from firefox import FirefoxScanner
 
 #
 # brew install youtube-dl ffmpeg libav
@@ -148,22 +152,31 @@ def run():
             if is_bookmarks_folder(node):
                 check_links(node["children"])
 
+def run_firefox():
+    with FirefoxScanner() as scanner:
+        bookmarks = scanner.run()
+    check_links(bookmarks)
 
 @click.command()
 @click.option('--loop/--no-loop', default=False,
     help="Auto checking every 5 minutes.")
-def main(loop):
+@click.option('--firefox/--no-firefox', default=False,
+    help='Use Firefox instead of Chrome')
+def main(loop, firefox):
     click.echo("{} Starting ytmp3...".format(datetime.now().isoformat()), 
         nl=False)
+
+    main_func = run_firefox if firefox else run
+
     if loop:
         try:
             while True:
-                run()
+                main_func()
                 sleep(10)
         except KeyboardInterrupt:
             click.echo("\nGoodbye!")
     else:
-        run()
+        main_func()
 
 
 if __name__ == "__main__":
