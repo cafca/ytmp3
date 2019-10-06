@@ -23,8 +23,8 @@ CHROME_BOOKMARKS = path.sep.join([home, "Library/Application Support/Google/Chro
 MP3_FOLDER = path.sep.join([home, "Music", "ytmp3"])
 
 # Parameters for youtube-dl script
-YOUTUBE_PARAMS = """-f bestaudio --extract-audio --audio-format mp3 
---audio-quality 320 --add-metadata --embed-thumbnail --no-playlist"""
+YOUTUBE_PARAMS = """-f bestaudio --extract-audio --audio-format best 
+--audio-quality 0 --add-metadata --embed-thumbnail --no-playlist"""
 
 # File name pattern for mp3 using youtube-dl format option
 FNAME_FORMAT = "%(title)s (%(abr)sk)_%(id)s_%(ext)s.%(ext)s"
